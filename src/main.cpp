@@ -1625,24 +1625,47 @@ int64_t GetBlockValue(int nHeight)
             return 250000 * COIN;
     }
 
-    if (nHeight == 1) {
-        nSubsidy = 3000000 * COIN;
-    } else if (nHeight < 500 && nHeight > 0) {
-        nSubsidy = 1 * COIN;
-    } else if (nHeight == 501) {
-        nSubsidy = 1000 * COIN;
-    } else if (nHeight <= 1000000 && nHeight >= 502) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight <= 1001000 && nHeight >= 1000001) {
-        nSubsidy = 30 * COIN;
-    } else if (nHeight <= 5000000 && nHeight >= 1001001) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight <= 6000000 && nHeight >= 5000001) {
-        nSubsidy = 10 * COIN;
-    } else {
-        nSubsidy = 1 * COIN;
+    if(pindexBest->nHeight == 1)
+    {
+        nSubsidy = 6000000 * COIN;                     // Initilised static pre-mine
     }
-    return nSubsidy;
+        else if(pindexBest->nHeight < 500)             // First halving - Activated instamine protection 
+    {
+        nSubsidy = 2 * COIN;   // 
+    }
+        else if(pindexBest->nHeight >= 501 && pindexBest->nHeight < 1000)            // Official Bonus Rewards 
+    {
+        nSubsidy = 4 * COIN; //                 // 1000 LUX for the first block mined after instamine protection
+    }
+        else if(pindexBest->nHeight == 1000)         // Third halving - Superblock rewards | Happy Birthday Lux 1 Year | 10/10/2018 | 30 LUX/block reward 
+    {
+        nSubsidy = 2000 * COIN;  // 
+    }
+        else if(pindexBest->nHeight >= 1001 && pindexBest->nHeight<=9999)         // Last halving - Re-activate normal blockchain
+    {
+        nSubsidy = 4 * COIN;  // 
+    }
+		else if(pindexBest->nHeight < 10000) // PoW end block 6m - Reduce block reward | Automatic initilised new blockchain after 6m blocks 
+    {
+        nSubsidy = 4000 * COIN;  // 
+    }
+	else if(pindexBest->nHeight >= 10001 && pindexBest->nHeight <= 99999)
+   {
+		nSubsidy = 4 * COIN;
+   }
+	else if (pindexBest->nHeight == 100000)
+	{
+		nSubsidy = 5000 * COIN;
+	}
+        else
+    {
+        nSubsidy = 4 * COIN; 
+    }
+
+    LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d nHeight=%d\n", FormatMoney(nSubsidy), nSubsidy, nHeight);
+
+    return nSubsidy + nFees;
+
 }
 
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
